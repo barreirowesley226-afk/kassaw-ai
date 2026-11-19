@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KASSAW AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      padding: 24px;
+    }
+    .box {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    textarea {
+      width: 100%;
+      height: 110px;
+      border-radius: 8px;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    button {
+      background: #22c55e;
+      color: #052e16;
+      font-weight: bold;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #reply {
+      margin-top: 16px;
+      background: #0f172a;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>KASSAW AI</h2>
+    <textarea id="prompt" placeholder="Ask something..."></textarea>
+    <button id="sendBtn" onclick="sendPrompt()">Send</button>
+    <div id="reply">Your answer will appear here.</div>
+  </div>
+
+  <script>
+    async function sendPrompt() {
+      const promptEl = document.getElementById("prompt");
+      const replyEl = document.getElementById("reply");
+      const btn = document.getElementById("sendBtn");
+      const prompt = promptEl.value.trim();
+
+      if (!prompt) {
+        replyEl.textContent = "Please type a question first.";
+        return;
+      }
+
+      btn.disabled = true;
+      replyEl.textContent = "Thinking...";
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        replyEl.textContent = data.reply || data.error || "No response.";
+      } catch (e) {
+        replyEl.textContent = "Network error.";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
